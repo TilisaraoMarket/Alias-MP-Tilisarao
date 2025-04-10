@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alias MP Tilisarao</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-blue-900 min-h-screen text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function App() {
+            const [searchTerm, setSearchTerm] = React.useState('');
+            const [notification, setNotification] = React.useState('');
+            const [showContactForm, setShowContactForm] = React.useState(false);
+            const [comercios] = React.useState([
+                {
+                    id: 1,
+                    nombre: "Boutique Elegance",
+                    categoria: "Ropa",
+                    alias: "boutique.elegance.mp",
+                    descripcion: "Tienda de ropa y accesorios"
+                },
+                {
+                    id: 2,
+                    nombre: "Panadería Don Pedro",
+                    categoria: "Alimentos",
+                    alias: "panaderia.pedro.mp",
+                    descripcion: "Panadería y repostería artesanal"
+                },
+                // Agregar más comercios aquí
+            ]);
+
+            const copiarAlias = (alias) => {
+                navigator.clipboard.writeText(alias).then(() => {
+                    setNotification('¡Alias copiado! Abriendo Mercado Pago...');
+                    setTimeout(() => setNotification(''), 2000);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'mercadopago://';
+                    }, 500);
+                });
+            };
+
+            const comerciosFiltrados = comercios.filter(comercio =>
+                comercio.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                comercio.categoria.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            const ContactForm = () => (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="glass-effect rounded-lg p-6 max-w-md w-full">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold">Agregar mi Comercio</h2>
+                            <button 
+                                onClick={() => setShowContactForm(false)}
+                                className="text-gray-400 hover:text-white"
+                            >
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <form action="https://formspree.io/f/mvgzqkpv" method="POST" className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Nombre del Comercio</label>
+                                <input
+                                    type="text"
+                                    name="comercio"
+                                    required
+                                    className="w-full bg-white/10 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Categoría</label>
+                                <input
+                                    type="text"
+                                    name="categoria"
+                                    required
+                                    className="w-full bg-white/10 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Alias de Mercado Pago</label>
+                                <input
+                                    type="text"
+                                    name="alias"
+                                    required
+                                    className="w-full bg-white/10 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">WhatsApp</label>
+                                <input
+                                    type="tel"
+                                    name="whatsapp"
+                                    required
+                                    className="w-full bg-white/10 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-colors"
+                            >
+                                Enviar Solicitud
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="container mx-auto px-4 py-8">
+                    {/* Header */}
+                    <header className="text-center mb-8">
+                        <h1 className="text-3xl font-bold mb-2">
+                            <i className="fas fa-store mr-2"></i>
+                            Alias MP Tilisarao
+                        </h1>
+                        <p className="text-gray-300">Paga fácil a comercios locales</p>
+                        <button
+                            onClick={() => setShowContactForm(true)}
+                            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                        >
+                            <i className="fas fa-plus mr-2"></i>
+                            Agregar mi Comercio
+                        </button>
+                    </header>
+
+                    {/* Buscador */}
+                    <div className="glass-effect rounded-lg p-4 mb-6">
+                        <div className="relative">
+                            <input
+                                type="search"
+                                placeholder="Buscar comercio..."
+                                className="w-full bg-white/10 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <i className="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+
+                    {/* Notificación */}
+                    {notification && (
+                        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+                            {notification}
+                        </div>
+                    )}
+
+                    {/* Modal de Contacto */}
+                    {showContactForm && <ContactForm />}
+
+                    {/* Lista de Comercios */}
+                    <div className="space-y-4">
+                        {comerciosFiltrados.map(comercio => (
+                            <div key={comercio.id} className="glass-effect rounded-lg p-4">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h3 className="text-lg font-semibold">{comercio.nombre}</h3>
+                                        <p className="text-sm text-gray-300">{comercio.descripcion}</p>
+                                        <span className="inline-block bg-blue-500 text-xs px-2 py-1 rounded mt-1">
+                                            {comercio.categoria}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={() => copiarAlias(comercio.alias)}
+                                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
+                                    >
+                                        <i className="fas fa-copy mr-2"></i>
+                                        Copiar Alias
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Footer */}
+                    <footer className="text-center mt-8 text-sm text-gray-400">
+                        <p>Conectado con Tilisarao Market</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

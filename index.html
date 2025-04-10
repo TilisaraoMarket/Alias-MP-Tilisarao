@@ -44,43 +44,49 @@
                 // Agregar más comercios aquí
             ]);
 
+            const openMercadoPagoApp = () => {
+                const mpSchemes = {
+                    android: {
+                        app: 'mercadopago://home',
+                        intent: 'intent://home#Intent;package=com.mercadopago.wallet;scheme=mercadopago;end',
+                        playStore: 'market://details?id=com.mercadopago.wallet',
+                    },
+                    ios: {
+                        app: 'mercadopago://',
+                        appStore: 'https://apps.apple.com/ar/app/mercado-pago/id925436649',
+                    },
+                    web: 'https://www.mercadopago.com.ar'
+                };
+
+                const ua = navigator.userAgent.toLowerCase();
+                const isAndroid = ua.indexOf("android") > -1;
+                const isIOS = /iphone|ipad|ipod/.test(ua);
+
+                const handleFallback = (fallbackUrl) => {
+                    setTimeout(() => {
+                        if (!document.hidden) {
+                            window.location.href = fallbackUrl;
+                        }
+                    }, 3000); // Increased timeout to 3 seconds
+                };
+
+                if (isAndroid) {
+                    window.location.href = mpSchemes.android.intent;
+                    handleFallback(mpSchemes.android.playStore);
+                } else if (isIOS) {
+                    window.location.href = mpSchemes.ios.app;
+                    handleFallback(mpSchemes.ios.appStore);
+                } else {
+                    window.location.href = mpSchemes.web;
+                }
+            };
+
             const copiarAlias = (alias) => {
                 navigator.clipboard.writeText(alias).then(() => {
                     setNotification('¡Alias copiado! Intentando abrir Mercado Pago...');
                     setTimeout(() => setNotification(''), 2000);
 
-                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    if (isMobile) {
-                        const ua = navigator.userAgent.toLowerCase();
-                        const isAndroid = ua.indexOf('android') > -1;
-                        const isIOS = /iphone|ipad|ipod/.test(ua);
-
-                        // Manejo de fallback para tienda de apps
-                        const fallbackStore = () => {
-                            setTimeout(() => {
-                                if (!document.hidden) {
-                                    if (isAndroid) {
-                                        window.location.href = 'market://details?id=com.mercadopago.wallet';
-                                    } else if (isIOS) {
-                                        window.location.href = 'https://apps.apple.com/ar/app/mercado-pago/id925436649';
-                                    }
-                                }
-                            }, 1500);
-                        };
-
-                        if (isAndroid) {
-                            // Primero intenta abrir la app con intent
-                            window.location.href = 'intent://www.mercadopago.com/#Intent;scheme=mercadopago;package=com.mercadopago.wallet;end';
-                            fallbackStore();
-                        } else if (isIOS) {
-                            // Intenta abrir la app iOS
-                            window.location.href = 'mercadopago://';
-                            fallbackStore();
-                        }
-                    } else {
-                        // Si no es móvil, abre la versión web
-                        window.open('https://www.mercadopago.com.ar', '_blank');
-                    }
+                    openMercadoPagoApp();
                 });
             };
 
